@@ -17,7 +17,7 @@ func TestDriver_Run(t *testing.T) {
 		image = "pvtlmc/example-outputs@sha256:568461508c8d220742add8abd226b33534d4269868df4b3178fae1cba3818a6e"
 	}
 
-	op := &driver.Operation{
+	op := &operation.Operation{
 		Installation: "example",
 		Action:       "install",
 		Image:        image,

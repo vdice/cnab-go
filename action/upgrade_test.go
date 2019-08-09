@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/deislabs/cnab-go/claim"
-	"github.com/deislabs/cnab-go/driver"
+	"github.com/deislabs/cnab-go/driver/operation"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +21,7 @@ func TestUpgrade_Run(t *testing.T) {
 		c := newClaim()
 		upgr := &Upgrade{Driver: &mockDriver{
 			shouldHandle: true,
-			Result: driver.OperationResult{
+			Result: operation.OperationResult{
 				Outputs: map[string]string{
 					"/tmp/some/path": "SOME CONTENT",
 				},
@@ -41,7 +41,7 @@ func TestUpgrade_Run(t *testing.T) {
 		c.Bundle.Outputs = nil
 		upgr := &Upgrade{Driver: &mockDriver{
 			shouldHandle: true,
-			Result:       driver.OperationResult{},
+			Result:       operation.OperationResult{},
 			Error:        nil,
 		}}
 		err := upgr.Run(c, mockSet, out)

@@ -8,6 +8,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/deislabs/cnab-go/bundle"
+	"github.com/deislabs/cnab-go/driver/operation"
 )
 
 var _ Driver = &DebugDriver{}
@@ -16,7 +19,7 @@ func TestDebugDriver_Handles(t *testing.T) {
 	d := &DebugDriver{}
 	is := assert.New(t)
 	is.NotNil(d)
-	is.True(d.Handles(ImageTypeDocker))
+	is.True(d.Handles(bundle.ImageTypeDocker))
 	is.True(d.Handles("anything"))
 }
 
@@ -25,7 +28,7 @@ func TestDebugDriver_Run(t *testing.T) {
 	is := assert.New(t)
 	is.NotNil(d)
 
-	op := &Operation{
+	op := &operation.Operation{
 		Installation: "test",
 		Image:        "test:1.2.3",
 		ImageType:    "oci",
@@ -37,7 +40,7 @@ func TestDebugDriver_Run(t *testing.T) {
 }
 
 func TestOperation_Unmarshall(t *testing.T) {
-	expectedOp := Operation{
+	expectedOp := operation.Operation{
 		Action:       "install",
 		Installation: "test",
 		Parameters: map[string]interface{}{
@@ -55,7 +58,7 @@ func TestOperation_Unmarshall(t *testing.T) {
 			"/cnab/app/image-map.json": "{}",
 		},
 	}
-	var op Operation
+	var op operation.Operation
 	is := assert.New(t)
 	bytes, err := ioutil.ReadFile("../testdata/operations/valid-operation.json")
 	is.NoError(err, "Error reading from testdata/operations/valid-operation.json")
@@ -65,7 +68,7 @@ func TestOperation_Unmarshall(t *testing.T) {
 }
 
 func TestOperation_Marshall(t *testing.T) {
-	actualOp := Operation{
+	actualOp := operation.Operation{
 		Action:       "install",
 		Installation: "test",
 		Parameters: map[string]interface{}{
@@ -89,7 +92,7 @@ func TestOperation_Marshall(t *testing.T) {
 	is.NoError(err, "Error Marshalling actual operation to json")
 	is.NotNil(bytes, "Expected marshalled json not to be nil")
 	actualJSON := string(bytes)
-	var expectedOp Operation
+	var expectedOp operation.Operation
 	bytes, err = ioutil.ReadFile("../testdata/operations/valid-operation.json")
 	is.NoError(err, "Error reading from testdata/operations/valid-operation.json")
 	is.NoError(json.Unmarshal(bytes, &expectedOp), "Error unmarshalling expected operation")

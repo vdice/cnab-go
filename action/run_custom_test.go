@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/deislabs/cnab-go/claim"
-	"github.com/deislabs/cnab-go/driver"
+	"github.com/deislabs/cnab-go/driver/operation"
 
 	"github.com/deislabs/cnab-go/bundle"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +20,7 @@ func TestRunCustom(t *testing.T) {
 	rc := &RunCustom{
 		Driver: &mockDriver{
 			shouldHandle: true,
-			Result: driver.OperationResult{
+			Result: operation.OperationResult{
 				Outputs: map[string]string{
 					"/tmp/some/path": "SOME CONTENT",
 				},
@@ -44,7 +44,7 @@ func TestRunCustom(t *testing.T) {
 		c.Bundle.Outputs = nil
 		rc.Driver = &mockDriver{
 			shouldHandle: true,
-			Result:       driver.OperationResult{},
+			Result:       operation.OperationResult{},
 			Error:        nil,
 		}
 		err := rc.Run(c, mockSet, out)
@@ -69,7 +69,7 @@ func TestRunCustom(t *testing.T) {
 	t.Run("error case: driver returns error", func(t *testing.T) {
 		c := newClaim()
 		rc.Driver = &mockDriver{
-			Result: driver.OperationResult{
+			Result: operation.OperationResult{
 				Outputs: map[string]string{
 					"/tmp/some/path": "SOME CONTENT",
 				},
@@ -92,7 +92,7 @@ func TestRunCustom(t *testing.T) {
 		c.Bundle.Actions["test"] = action
 
 		rc.Driver = &mockDriver{
-			Result: driver.OperationResult{
+			Result: operation.OperationResult{
 				Outputs: map[string]string{
 					"/tmp/some/path": "SOME CONTENT",
 				},

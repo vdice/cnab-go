@@ -4,10 +4,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/deislabs/cnab-go/driver"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
+
+	"github.com/deislabs/cnab-go/driver/operation"
 )
 
 func TestDriver_Run(t *testing.T) {
@@ -21,7 +22,7 @@ func TestDriver_Run(t *testing.T) {
 		SkipCleanup:        true,
 		skipJobStatusCheck: true,
 	}
-	op := driver.Operation{
+	op := operation.Operation{
 		Action: "install",
 		Out:    os.Stdout,
 		Environment: map[string]string{

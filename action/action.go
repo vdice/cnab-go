@@ -13,6 +13,7 @@ import (
 	"github.com/deislabs/cnab-go/claim"
 	"github.com/deislabs/cnab-go/credentials"
 	"github.com/deislabs/cnab-go/driver"
+	"github.com/deislabs/cnab-go/driver/operation"
 )
 
 // stateful is there just to make callers of opFromClaims more readable
@@ -193,7 +194,7 @@ func appliesToAction(action string, parameter bundle.Parameter) bool {
 	return false
 }
 
-func opFromClaim(action string, stateless bool, c *claim.Claim, ii bundle.InvocationImage, creds credentials.Set, w io.Writer) (*driver.Operation, error) {
+func opFromClaim(action string, stateless bool, c *claim.Claim, ii bundle.InvocationImage, creds credentials.Set, w io.Writer) (*operation.Operation, error) {
 	env, files, err := creds.Expand(c.Bundle, stateless)
 	if err != nil {
 		return nil, err
@@ -228,7 +229,7 @@ func opFromClaim(action string, stateless bool, c *claim.Claim, ii bundle.Invoca
 		}
 	}
 
-	return &driver.Operation{
+	return &operation.Operation{
 		Action:       action,
 		Installation: c.Name,
 		Parameters:   c.Parameters,

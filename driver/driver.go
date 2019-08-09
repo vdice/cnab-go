@@ -2,42 +2,14 @@ package driver
 
 import (
 	"fmt"
-	"io"
 
 	"github.com/docker/go/canonical/json"
-)
 
-// ImageType constants provide some of the image types supported
-// TODO: I think we can remove all but Docker, since the rest are supported externally
-const (
-	ImageTypeDocker = "docker"
-	ImageTypeOCI    = "oci"
-	ImageTypeQCOW   = "qcow"
+	"github.com/deislabs/cnab-go/driver/command"
+	"github.com/deislabs/cnab-go/driver/docker"
+	"github.com/deislabs/cnab-go/driver/kubernetes"
+	"github.com/deislabs/cnab-go/driver/operation"
 )
-
-// Operation describes the data passed into the driver to run an operation
-type Operation struct {
-	// Installation is the name of this installation
-	Installation string `json:"installation_name"`
-	// The revision ID for this installation
-	Revision string `json:"revision"`
-	// Action is the action to be performed
-	Action string `json:"action"`
-	// Parameters are the parameters to be injected into the container
-	Parameters map[string]interface{} `json:"parameters"`
-	// Image is the invocation image
-	Image string `json:"image"`
-	// ImageType is the type of image.
-	ImageType string `json:"image_type"`
-	// Environment contains environment variables that should be injected into the invocation image
-	Environment map[string]string `json:"environment"`
-	// Files contains files that should be injected into the invocation image.
-	Files map[string]string `json:"files"`
-	// Outputs is a list of paths starting with `/cnab/app/outputs` that the driver should return the contents of in the OperationResult.
-	Outputs []string `json:"outputs"`
-	// Output stream for log messages from the driver
-	Out io.Writer `json:"-"`
-}
 
 // ResolvedCred is a credential that has been resolved and is ready for injection into the runtime.
 type ResolvedCred struct {
@@ -46,16 +18,10 @@ type ResolvedCred struct {
 	Value string `json:"value"`
 }
 
-// OperationResult is the output of the Driver running an Operation.
-type OperationResult struct {
-	// Outputs is a map from the container path of an output file to its contents (i.e. /cnab/app/outputs/...).
-	Outputs map[string]string
-}
-
 // Driver is capable of running a invocation image
 type Driver interface {
 	// Run executes the operation inside of the invocation image
-	Run(*Operation) (OperationResult, error)
+	Run(*operation.Operation) (operation.OperationResult, error)
 	// Handles receives an ImageType* and answers whether this driver supports that type
 	Handles(string) bool
 }
@@ -77,13 +43,13 @@ type DebugDriver struct {
 }
 
 // Run executes the operation on the Debug driver
-func (d *DebugDriver) Run(op *Operation) (OperationResult, error) {
+func (d *DebugDriver) Run(op *operation.Operation) (operation.OperationResult, error) {
 	data, err := json.MarshalIndent(op, "", "  ")
 	if err != nil {
-		return OperationResult{}, err
+		return operation.OperationResult{}, err
 	}
 	fmt.Fprintln(op.Out, string(data))
-	return OperationResult{}, nil
+	return operation.OperationResult{}, nil
 }
 
 // Handles always returns true, effectively claiming to work for any image type
@@ -101,4 +67,23 @@ func (d *DebugDriver) Config() map[string]string {
 // SetConfig sets configuration for this driver
 func (d *DebugDriver) SetConfig(settings map[string]string) {
 	d.config = settings
+}
+
+// Lookup takes a driver name and tries to resolve the most pertinent driver.
+func Lookup(name string) (Driver, error) {
+	switch name {
+	case "docker":
+		return &docker.Driver{}, nil
+	case "kubernetes", "k8s":
+		return &kubernetes.Driver{}, nil
+	case "debug":
+		return &DebugDriver{}, nil
+	default:
+		cmddriver := &command.Driver{Name: name}
+		if cmddriver.CheckDriverExists() {
+			return cmddriver, nil
+		}
+
+		return nil, fmt.Errorf("unsupported driver or driver not found in PATH: %s", name)
+	}
 }

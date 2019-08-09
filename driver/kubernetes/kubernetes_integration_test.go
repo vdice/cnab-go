@@ -20,13 +20,13 @@ func TestDriver_Run_Integration(t *testing.T) {
 
 	cases := []struct {
 		name   string
-		op     *driver.Operation
+		op     *operation.Operation
 		output string
 		err    error
 	}{
 		{
 			name: "install",
-			op: &driver.Operation{
+			op: &operation.Operation{
 				Installation: "example",
 				Action:       "install",
 				Image:        "cnab/helloworld@sha256:55f83710272990efab4e076f9281453e136980becfd879640b06552ead751284",

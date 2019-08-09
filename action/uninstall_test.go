@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/deislabs/cnab-go/claim"
-	"github.com/deislabs/cnab-go/driver"
+	"github.com/deislabs/cnab-go/driver/operation"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,7 +22,7 @@ func TestUninstall_Run(t *testing.T) {
 		uninst := &Uninstall{
 			Driver: &mockDriver{
 				shouldHandle: true,
-				Result: driver.OperationResult{
+				Result: operation.OperationResult{
 					Outputs: map[string]string{
 						"/tmp/some/path": "SOME CONTENT",
 					},
@@ -44,7 +44,7 @@ func TestUninstall_Run(t *testing.T) {
 		uninst := &Uninstall{
 			Driver: &mockDriver{
 				shouldHandle: true,
-				Result:       driver.OperationResult{},
+				Result:       operation.OperationResult{},
 				Error:        nil,
 			},
 		}
@@ -70,7 +70,7 @@ func TestUninstall_Run(t *testing.T) {
 	t.Run("error case: driver does handle image", func(t *testing.T) {
 		c := newClaim()
 		uninst := &Uninstall{Driver: &mockDriver{
-			Result: driver.OperationResult{
+			Result: operation.OperationResult{
 				Outputs: map[string]string{
 					"/tmp/some/path": "SOME CONTENT",
 				},

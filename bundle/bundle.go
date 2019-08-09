@@ -77,6 +77,14 @@ type LocationRef struct {
 	MediaType string `json:"mediaType" yaml:"mediaType"`
 }
 
+// These constants provide some of the image types supported
+// TODO: I think we can remove all but Docker, since the rest are supported externally
+const (
+	ImageTypeDocker = "docker"
+	ImageTypeOCI    = "oci"
+	ImageTypeQCOW   = "qcow"
+)
+
 // BaseImage contains fields shared across image types
 type BaseImage struct {
 	ImageType string            `json:"imageType" yaml:"imageType"`

@@ -11,6 +11,7 @@ import (
 	"github.com/deislabs/cnab-go/claim"
 	"github.com/deislabs/cnab-go/credentials"
 	"github.com/deislabs/cnab-go/driver"
+	"github.com/deislabs/cnab-go/driver/operation"
 
 	"github.com/deislabs/cnab-go/bundle"
 	"github.com/deislabs/cnab-go/bundle/definition"
@@ -21,14 +22,14 @@ import (
 
 type mockDriver struct {
 	shouldHandle bool
-	Result       driver.OperationResult
+	Result       operation.OperationResult
 	Error        error
 }
 
 func (d *mockDriver) Handles(imageType string) bool {
 	return d.shouldHandle
 }
-func (d *mockDriver) Run(op *driver.Operation) (driver.OperationResult, error) {
+func (d *mockDriver) Run(op *operation.Operation) (operation.OperationResult, error) {
 	return d.Result, d.Error
 }
 
@@ -172,7 +173,7 @@ func TestOpFromClaim(t *testing.T) {
 	is.Equal(c.Name, op.Installation)
 	is.Equal(c.Revision, op.Revision)
 	is.Equal(invocImage.Image, op.Image)
-	is.Equal(driver.ImageTypeDocker, op.ImageType)
+	is.Equal(bundle.ImageTypeDocker, op.ImageType)
 	is.Equal(op.Environment["SECRET_ONE"], "I'm a secret")
 	is.Equal(op.Environment["PARAM_TWO"], "twoval")
 	is.Equal(op.Environment["CNAB_P_PARAM_ONE"], "oneval")
@@ -203,7 +204,7 @@ func TestOpFromClaim_NoOutputsOnBundle(t *testing.T) {
 	is.Equal(c.Name, op.Installation)
 	is.Equal(c.Revision, op.Revision)
 	is.Equal(invocImage.Image, op.Image)
-	is.Equal(driver.ImageTypeDocker, op.ImageType)
+	is.Equal(bundle.ImageTypeDocker, op.ImageType)
 	is.Equal(op.Environment["SECRET_ONE"], "I'm a secret")
 	is.Equal(op.Files["/secret/two"], "I'm also a secret")
 	is.Contains(op.Files, "/cnab/app/image-map.json")
@@ -230,7 +231,7 @@ func TestOpFromClaim_NoParameter(t *testing.T) {
 	is.Equal(c.Name, op.Installation)
 	is.Equal(c.Revision, op.Revision)
 	is.Equal(invocImage.Image, op.Image)
-	is.Equal(driver.ImageTypeDocker, op.ImageType)
+	is.Equal(bundle.ImageTypeDocker, op.ImageType)
 	is.Equal(op.Environment["SECRET_ONE"], "I'm a secret")
 	is.Equal(op.Files["/secret/two"], "I'm also a secret")
 	is.Contains(op.Files, "/cnab/app/image-map.json")

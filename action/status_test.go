@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/deislabs/cnab-go/driver"
+	"github.com/deislabs/cnab-go/driver/operation"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +20,7 @@ func TestStatus_Run(t *testing.T) {
 		st := &Status{
 			Driver: &mockDriver{
 				shouldHandle: true,
-				Result: driver.OperationResult{
+				Result: operation.OperationResult{
 					Outputs: map[string]string{
 						"/tmp/some/path": "SOME CONTENT",
 					},

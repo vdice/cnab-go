@@ -12,7 +12,6 @@ import (
 	// Convert transitive deps to direct deps so that we can use constraints in our Gopkg.toml
 	_ "github.com/Azure/go-autorest/autorest"
 
-	"github.com/deislabs/cnab-go/driver"
 	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -22,6 +21,9 @@ import (
 	coreclientv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/deislabs/cnab-go/bundle"
+	"github.com/deislabs/cnab-go/driver/operation"
 )
 
 const (
@@ -59,7 +61,7 @@ func New(namespace, serviceAccount string, conf *rest.Config) (*Driver, error) {
 
 // Handles receives an ImageType* and answers whether this driver supports that type.
 func (k *Driver) Handles(imagetype string) bool {
-	return imagetype == driver.ImageTypeDocker || imagetype == driver.ImageTypeOCI
+	return imagetype == bundle.ImageTypeDocker || imagetype == bundle.ImageTypeOCI
 }
 
 // Config returns the Kubernetes driver configuration options.
@@ -120,9 +122,9 @@ func (k *Driver) setClient(conf *rest.Config) error {
 }
 
 // Run executes the operation inside of the invocation image.
-func (k *Driver) Run(op *driver.Operation) (driver.OperationResult, error) {
+func (k *Driver) Run(op *operation.Operation) (operation.OperationResult, error) {
 	if k.Namespace == "" {
-		return driver.OperationResult{}, fmt.Errorf("KUBE_NAMESPACE is required")
+		return operation.OperationResult{}, fmt.Errorf("KUBE_NAMESPACE is required")
 	}
 	labelMap := generateLabels(op)
 	meta := metav1.ObjectMeta{
@@ -171,7 +173,7 @@ func (k *Driver) Run(op *driver.Operation) (driver.OperationResult, error) {
 		secret.ObjectMeta.GenerateName += "env-"
 		envsecret, err := k.secrets.Create(secret)
 		if err != nil {
-			return driver.OperationResult{}, err
+			return operation.OperationResult{}, err
 		}
 		if !k.SkipCleanup {
 			defer k.deleteSecret(envsecret.ObjectMeta.Name)
@@ -197,7 +199,7 @@ func (k *Driver) Run(op *driver.Operation) (driver.OperationResult, error) {
 		}
 		secret, err := k.secrets.Create(secret)
 		if err != nil {
-			return driver.OperationResult{}, err
+			return operation.OperationResult{}, err
 		}
 		if !k.SkipCleanup {
 			defer k.deleteSecret(secret.ObjectMeta.Name)
@@ -217,7 +219,7 @@ func (k *Driver) Run(op *driver.Operation) (driver.OperationResult, error) {
 	job.Spec.Template.Spec.Containers = []v1.Container{container}
 	job, err := k.jobs.Create(job)
 	if err != nil {
-		return driver.OperationResult{}, err
+		return operation.OperationResult{}, err
 	}
 	if !k.SkipCleanup {
 		defer k.deleteJob(job.ObjectMeta.Name)
@@ -226,14 +228,14 @@ func (k *Driver) Run(op *driver.Operation) (driver.OperationResult, error) {
 	// Return early for unit testing purposes (the fake k8s client implementation just
 	// hangs during watch because no events are ever created on the Job)
 	if k.skipJobStatusCheck {
-		return driver.OperationResult{}, nil
+		return operation.OperationResult{}, nil
 	}
 
 	selector := metav1.ListOptions{
 		LabelSelector: labels.Set(job.ObjectMeta.Labels).String(),
 	}
 
-	return driver.OperationResult{}, k.watchJobStatusAndLogs(selector, op.Out)
+	return operation.OperationResult{}, k.watchJobStatusAndLogs(selector, op.Out)
 }
 
 func (k *Driver) watchJobStatusAndLogs(selector metav1.ListOptions, out io.Writer) error {
@@ -336,11 +338,11 @@ func (k *Driver) deleteJob(name string) error {
 	})
 }
 
-func generateNameTemplate(op *driver.Operation) string {
+func generateNameTemplate(op *operation.Operation) string {
 	return fmt.Sprintf("%s-%s-", op.Installation, op.Action)
 }
 
-func generateLabels(op *driver.Operation) map[string]string {
+func generateLabels(op *operation.Operation) map[string]string {
 	return map[string]string{
 		"cnab.io/installation": op.Installation,
 		"cnab.io/action":       op.Action,

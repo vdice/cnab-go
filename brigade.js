@@ -57,6 +57,8 @@ function test(e, project) {
     `cp -a /src/.git ${localPath}`,
     `cd ${localPath}`,
     "make bootstrap",
+    // debug why the build is failing with the wrong module version
+    "cat go.mod",
     "make build",
     // Ensure that it compiles on the three main OS's
     "GOOS=windows make build",

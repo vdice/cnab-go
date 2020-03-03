@@ -555,6 +555,11 @@ func TestBundleYamlRoundtrip(t *testing.T) {
 	assert.Equal(t, exampleBundle, &roundTripBun, "after a roundtrip yaml marshal/unmarshal, the bundle does not match expected")
 }
 
+func TestValidateBundle(t *testing.T) {
+	err := exampleBundle.Validate()
+	require.NoError(t, err, "example bundle validation should succeed")
+}
+
 func TestValidateABundleAndParams(t *testing.T) {
 
 	bun, err := ioutil.ReadFile("../testdata/bundles/foo.json")

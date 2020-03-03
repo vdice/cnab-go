@@ -9,8 +9,10 @@ import (
 	"strings"
 
 	"github.com/cnabio/cnab-go/bundle/definition"
+	"github.com/cnabio/cnab-go/utils/schemavalidation"
 	"github.com/cnabio/cnab-go/utils/schemaversion"
 	"github.com/docker/go/canonical/json"
+	"github.com/hashicorp/go-multierror"
 	pkgErrors "github.com/pkg/errors"
 )
 
@@ -213,6 +215,7 @@ func (b Bundle) Validate() error {
 		reqExt[requiredExtension] = true
 	}
 
+	// Validate the invocation images
 	for _, img := range b.InvocationImages {
 		err := img.Validate()
 		if err != nil {
@@ -220,7 +223,40 @@ func (b Bundle) Validate() error {
 		}
 	}
 
-	return nil
+	// Validate the parameters
+	for _, param := range b.Parameters {
+		err := param.Validate()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Validate the credentials
+	for _, cred := range b.Credentials {
+		err := cred.Validate()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Marshal the bundle and validate against the Bundle schema
+	var result *multierror.Error
+	bundleBytes, err := json.Marshal(b)
+	if err != nil {
+		return pkgErrors.Wrap(err, "unable to marshal the bundle")
+	}
+
+	valErrors, err := schemavalidation.Validate("bundle", bundleBytes)
+	if err != nil {
+		return pkgErrors.Wrap(err, "bundle validation failed")
+	}
+	if len(valErrors) > 0 {
+		for _, valErr := range valErrors {
+			result = multierror.Append(result,
+				pkgErrors.Wrap(valErr, "bundle validation against the Bundle JSON schema failed"))
+		}
+	}
+	return result.ErrorOrNil()
 }
 
 // Validate the image contents.

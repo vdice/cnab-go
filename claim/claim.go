@@ -1,15 +1,18 @@
 package claim
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"regexp"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/oklog/ulid"
 	"github.com/pkg/errors"
 
 	"github.com/cnabio/cnab-go/bundle"
+	"github.com/cnabio/cnab-go/utils/schemavalidation"
 	"github.com/cnabio/cnab-go/utils/schemaversion"
 )
 
@@ -75,6 +78,7 @@ func New(name string) (*Claim, error) {
 		},
 		Parameters: map[string]interface{}{},
 		Outputs:    map[string]interface{}{},
+		Bundle:     &bundle.Bundle{},
 	}, nil
 }
 
@@ -105,9 +109,28 @@ func ULID() string {
 
 // Validate the Claim
 func (c Claim) Validate() error {
+	// Validate the schema version
 	err := c.SchemaVersion.Validate()
 	if err != nil {
 		return errors.Wrapf(err, "claim validation failed")
 	}
-	return nil
+
+	// Marshal the claim and validate against the Claim schema
+	var result *multierror.Error
+	claimBytes, err := json.Marshal(c)
+	if err != nil {
+		return errors.Wrap(err, "unable to marshal the claim")
+	}
+
+	valErrors, err := schemavalidation.Validate("claim", claimBytes)
+	if err != nil {
+		return errors.Wrap(err, "claim validation failed")
+	}
+	if len(valErrors) > 0 {
+		for _, valErr := range valErrors {
+			result = multierror.Append(result,
+				errors.Wrap(valErr, "claim validation against the Claim JSON schema failed"))
+		}
+	}
+	return result.ErrorOrNil()
 }

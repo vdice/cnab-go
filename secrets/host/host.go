@@ -21,24 +21,26 @@ var _ secrets.Store = &SecretStore{}
 
 type SecretStore struct{}
 
-func (h *SecretStore) Resolve(keyName string, keyValue string) (string, error) {
+func (h *SecretStore) Resolve(keyName string, keyValue interface{}) (interface{}, error) {
+	// TODO: check ok, bail or go straight to SourceValue logic if not
+	keyValueStr := keyValue.(string)
 	// Precedence is command, path, env, value
 	switch strings.ToLower(keyName) {
 	case SourceCommand:
-		data, err := execCmd(keyValue)
+		data, err := execCmd(keyValueStr)
 		if err != nil {
 			return "", err
 		}
 		return string(data), nil
 	case SourcePath:
-		data, err := ioutil.ReadFile(os.ExpandEnv(keyValue))
+		data, err := ioutil.ReadFile(os.ExpandEnv(keyValueStr))
 		if err != nil {
 			return "", err
 		}
 		return string(data), nil
 	case SourceEnv:
 		var ok bool
-		data, ok := os.LookupEnv(keyValue)
+		data, ok := os.LookupEnv(keyValueStr)
 		if !ok {
 			return "", fmt.Errorf("environment variable %s is not defined", keyName)
 		}

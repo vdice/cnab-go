@@ -335,16 +335,7 @@ func TestConvertValue(t *testing.T) {
 	is.Error(err)
 
 	pd.Type = "object"
-	_, err = pd.ConvertValue("nope")
-	is.Error(err)
-
-	_, err = pd.ConvertValue("123")
-	is.Error(err)
-
-	_, err = pd.ConvertValue("true")
-	is.Error(err)
-
-	_, err = pd.ConvertValue("123.5")
-	is.Error(err)
-
+	out, err = pd.ConvertValue(`{"object": true}`)
+	is.NoError(err)
+	is.Equal(`{"object": true}`, out.(string))
 }

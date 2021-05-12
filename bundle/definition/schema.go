@@ -112,18 +112,18 @@ func (s *Schema) UnmarshalJSON(data []byte) error {
 
 // ConvertValue attempts to convert the given string value to the type from the
 // definition. Note: this is only applicable to string, number, integer and boolean types
-func (s *Schema) ConvertValue(val string) (interface{}, error) {
+func (s *Schema) ConvertValue(val interface{}) (interface{}, error) {
 	dataType, ok, err := s.GetType()
 	if !ok {
 		return nil, errors.Wrapf(err, "unable to determine type: %v", s.Type)
 	}
 	switch dataType {
-	case "string":
+	case "string", "object":
 		return val, nil
 	case "integer":
-		return strconv.Atoi(val)
+		return strconv.Atoi(val.(string))
 	case "boolean":
-		switch strings.ToLower(val) {
+		switch strings.ToLower(val.(string)) {
 		case "true":
 			return true, nil
 		case "false":

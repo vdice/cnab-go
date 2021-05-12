@@ -557,10 +557,10 @@ func expandCredentials(b bundle.Bundle, set valuesource.Set, stateless bool, act
 			return
 		}
 		if val.EnvironmentVariable != "" {
-			env[val.EnvironmentVariable] = src
+			env[val.EnvironmentVariable] = src.(string)
 		}
 		if val.Path != "" {
-			files[val.Path] = src
+			files[val.Path] = src.(string)
 		}
 	}
 	return

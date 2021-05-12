@@ -98,7 +98,7 @@ func Validate(given valuesource.Set, spec map[string]bundle.Credential, action s
 //	- Expand them into bundle values
 func (c *CredentialSet) ResolveCredentials(s secrets.Store) (valuesource.Set, error) {
 	l := len(c.Credentials)
-	res := make(map[string]string, l)
+	res := make(map[string]interface{}, l)
 	for i := 0; i < l; i++ {
 		cred := c.Credentials[i]
 		val, err := s.Resolve(cred.Source.Key, cred.Source.Value)

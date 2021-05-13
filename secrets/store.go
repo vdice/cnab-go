@@ -9,5 +9,5 @@ type Store interface {
 	// - keyName=env, keyValue=CONN_STRING
 	// - keyName=key, keyValue=conn-string
 	// - keyName=path, keyValue=/tmp/connstring.txt
-	Resolve(keyName string, keyValue interface{}) (interface{}, error)
+	Resolve(keyName string, keyValue string) (string, error)
 }

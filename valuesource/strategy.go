@@ -46,13 +46,13 @@ type Strategy struct {
 	// Value holds the parameter or credential value.
 	// When a parameter or credential is loaded, it is loaded into this field. In all
 	// other cases, it is empty. This field is omitted during serialization.
-	Value interface{} `json:"-" yaml:"-"`
+	Value string `json:"-" yaml:"-"`
 }
 
 // Source represents a strategy for loading a value from local host.
 type Source struct {
 	Key   string
-	Value interface{}
+	Value string
 }
 
 func (s *Source) marshalRaw() interface{} {

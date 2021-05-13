@@ -31,7 +31,7 @@ func TestResolveHostCredentials(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dest, err := h.Resolve(tt.keyName, tt.keyValue)
 			is.NoError(err)
-			is.Equal(tt.expect, strings.TrimSpace(dest.(string)))
+			is.Equal(tt.expect, strings.TrimSpace(dest))
 		})
 	}
 }

@@ -2,7 +2,6 @@ package definition
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -113,7 +112,7 @@ func (s *Schema) UnmarshalJSON(data []byte) error {
 
 // ConvertValue attempts to convert the given string value to the type from the
 // definition. Note: this is only applicable to string, number, integer and boolean types
-func (s *Schema) ConvertValue(val interface{}) (interface{}, error) {
+func (s *Schema) ConvertValue(val string) (interface{}, error) {
 	dataType, ok, err := s.GetType()
 	if !ok {
 		return nil, errors.Wrapf(err, "unable to determine type: %v", s.Type)
@@ -122,9 +121,9 @@ func (s *Schema) ConvertValue(val interface{}) (interface{}, error) {
 	case "string":
 		return val, nil
 	case "integer":
-		return strconv.Atoi(val.(string))
+		return strconv.Atoi(val)
 	case "boolean":
-		switch strings.ToLower(val.(string)) {
+		switch strings.ToLower(val) {
 		case "true":
 			return true, nil
 		case "false":
@@ -134,12 +133,8 @@ func (s *Schema) ConvertValue(val interface{}) (interface{}, error) {
 		}
 	case "object":
 		var obj interface{}
-		valStr, ok := val.(string)
-		if !ok {
-			return nil, fmt.Errorf("value %v cannot be cast to a string for unmarshaling", val)
-		}
-		if err := json.Unmarshal([]byte(valStr), &obj); err != nil {
-			return nil, errors.Wrapf(err, "could not unmarshal value %v", val)
+		if err := json.Unmarshal([]byte(val), &obj); err != nil {
+			return nil, errors.Wrapf(err, "could not unmarshal value %v into a json object", val)
 		}
 		return obj, nil
 	default:

@@ -338,4 +338,9 @@ func TestConvertValue(t *testing.T) {
 	out, err = pd.ConvertValue(`{"object": true}`)
 	is.NoError(err)
 	is.Equal(map[string]interface{}{"object": true}, out)
+
+	out, err = pd.ConvertValue(`{"object" true}`)
+	is.Error(err)
+	is.Contains(err.Error(), "could not unmarshal")
+	is.Equal(nil, out)
 }

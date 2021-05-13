@@ -201,18 +201,6 @@ func ValuesOrDefaults(vals map[string]interface{}, b *Bundle, action string) (ma
 			return res, fmt.Errorf("unable to find definition for %s", name)
 		}
 		if val, ok := vals[name]; ok {
-			if s.Type == "object" {
-				var obj interface{}
-				valStr, ok := val.(string)
-				if !ok {
-					return res, fmt.Errorf("value %v of type 'object' cannot be cast to a string for unmarshaling", val)
-				}
-				if err := json.Unmarshal([]byte(valStr), &obj); err != nil {
-					return res, pkgErrors.Wrapf(err, "could not unmarshal value %v", val)
-				}
-				val = obj
-			}
-
 			valErrs, err := s.Validate(val)
 			if err != nil {
 				return res, pkgErrors.Wrapf(err, "encountered an error validating parameter %s", name)

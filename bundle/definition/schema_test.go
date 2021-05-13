@@ -337,5 +337,5 @@ func TestConvertValue(t *testing.T) {
 	pd.Type = "object"
 	out, err = pd.ConvertValue(`{"object": true}`)
 	is.NoError(err)
-	is.Equal(`{"object": true}`, out.(string))
+	is.Equal(map[string]interface{}{"object": true}, out)
 }

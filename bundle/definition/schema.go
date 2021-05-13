@@ -2,6 +2,7 @@ package definition
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -118,7 +119,7 @@ func (s *Schema) ConvertValue(val interface{}) (interface{}, error) {
 		return nil, errors.Wrapf(err, "unable to determine type: %v", s.Type)
 	}
 	switch dataType {
-	case "string", "object":
+	case "string":
 		return val, nil
 	case "integer":
 		return strconv.Atoi(val.(string))
@@ -131,6 +132,16 @@ func (s *Schema) ConvertValue(val interface{}) (interface{}, error) {
 		default:
 			return false, errors.Errorf("%q is not a valid boolean", val)
 		}
+	case "object":
+		var obj interface{}
+		valStr, ok := val.(string)
+		if !ok {
+			return nil, fmt.Errorf("value %v cannot be cast to a string for unmarshaling", val)
+		}
+		if err := json.Unmarshal([]byte(valStr), &obj); err != nil {
+			return nil, errors.Wrapf(err, "could not unmarshal value %v", val)
+		}
+		return obj, nil
 	default:
 		return nil, errors.New("invalid definition")
 	}

@@ -8,7 +8,7 @@ import (
 
 // Set is an actual set of resolved values.
 // This is the output of resolving a parameter or credential set file.
-type Set map[string]interface{}
+type Set map[string]string
 
 // Merge merges a second Set into the base.
 //
@@ -59,7 +59,7 @@ func (s *Source) marshalRaw() interface{} {
 	if s.Key == "" {
 		return nil
 	}
-	return map[string]interface{}{s.Key: s.Value}
+	return map[string]string{s.Key: s.Value}
 }
 
 func (s *Source) unmarshalRaw(raw map[string]string) error {

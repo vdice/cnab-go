@@ -51,7 +51,7 @@ func TestCredentialSet_ResolveCredentials(t *testing.T) {
 	} {
 		dest, ok := results[tt.name]
 		is.True(ok)
-		is.Equal(tt.expect, strings.TrimSpace(dest.(string)))
+		is.Equal(tt.expect, strings.TrimSpace(dest))
 	}
 }
 

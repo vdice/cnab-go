@@ -322,17 +322,14 @@ func TestConvertValue(t *testing.T) {
 	is.Error(err)
 
 	pd.Type = "array"
-	_, err = pd.ConvertValue("nope")
-	is.Error(err)
+	out, err = pd.ConvertValue(`[1, 2, 3]`)
+	is.NoError(err)
+	is.Equal([]interface{}{float64(1), float64(2), float64(3)}, out)
 
-	_, err = pd.ConvertValue("123")
+	out, err = pd.ConvertValue(`[1, 2 3]`)
 	is.Error(err)
-
-	_, err = pd.ConvertValue("true")
-	is.Error(err)
-
-	_, err = pd.ConvertValue("123.5")
-	is.Error(err)
+	is.Contains(err.Error(), "could not unmarshal")
+	is.Equal(nil, out)
 
 	pd.Type = "object"
 	out, err = pd.ConvertValue(`{"object": true}`)

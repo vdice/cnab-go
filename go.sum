@@ -72,6 +72,7 @@ github.com/bugsnag/panicwrap v1.2.0 h1:OzrKrRvXis8qEvOkfcxNcYbOd2O7xXS2nnKMEMABF
 github.com/bugsnag/panicwrap v1.2.0/go.mod h1:D/8v3kj0zr8ZAKg1AQ6crr+5VwKN5eIywRkfhyM/+dE=
 github.com/carolynvs/jsonschema v0.2.1-0.20201229145510-cc593f443fdb h1:c7GTaHPGaDjZ7z0GYHcpml41Xy72pSkaw4xFMPbz3Aw=
 github.com/carolynvs/jsonschema v0.2.1-0.20201229145510-cc593f443fdb/go.mod h1:g7DPkiOsK1xv6T/Ao5scXRkd+yTFygcANPBaaqW+VrI=
+github.com/carolynvs/jsonschema v0.2.1-0.20210120214917-11cc5e4545c8 h1:16VbsGehowzXze3ILYSMz1TH8GtnlrMij3/sUDGTrRo=
 github.com/carolynvs/jsonschema v0.2.1-0.20210120214917-11cc5e4545c8/go.mod h1:g7DPkiOsK1xv6T/Ao5scXRkd+yTFygcANPBaaqW+VrI=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=

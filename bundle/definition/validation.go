@@ -3,6 +3,7 @@ package definition
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -25,7 +26,7 @@ func (s *Schema) Validate(data interface{}) ([]ValidationError, error) {
 		return nil, errors.Wrap(err, "unable to load schema")
 	}
 	def := NewRootSchema()
-	err = json.Unmarshal([]byte(b), def)
+	err = def.UnmarshalJSON(b)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to build schema")
 	}
@@ -33,6 +34,8 @@ func (s *Schema) Validate(data interface{}) ([]ValidationError, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to process data")
 	}
+	fmt.Printf("schema = %+v", def)
+	fmt.Printf("payload = %s", string(payload))
 	valErrs, err := def.ValidateBytes(context.Background(), payload)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to perform validation")

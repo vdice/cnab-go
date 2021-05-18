@@ -118,7 +118,7 @@ func (s *Schema) ConvertValue(val string) (interface{}, error) {
 		return nil, errors.Wrapf(err, "unable to determine type: %v", s.Type)
 	}
 	switch dataType {
-	case "string", "object":
+	case "string":
 		return val, nil
 	case "integer":
 		return strconv.Atoi(val)

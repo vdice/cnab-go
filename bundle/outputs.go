@@ -46,11 +46,16 @@ func (o *Output) Validate(name string, bun Bundle) error {
 		return errors.New("output definition must be provided")
 	}
 
-	// Validate default against definition schema, if exists
+	// Validate output definition schema
 	schema, ok := bun.Definitions[o.Definition]
 	if !ok {
 		return fmt.Errorf("unable to find definition for %s", name)
 	}
+	if _, err := schema.ValidateSchema(); err != nil {
+		return errors.Wrapf(err, "invalid definition schema for output %q", name)
+	}
+
+	// Validate default against definition schema, if exists
 	var valResult *multierror.Error
 	if schema.Default != nil {
 		valErrs, err := schema.Validate(schema.Default)

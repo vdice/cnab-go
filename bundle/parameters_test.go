@@ -125,4 +125,10 @@ func TestParameterValidate(t *testing.T) {
 		err := p.Validate("param", b)
 		assert.NoError(t, err)
 	})
+
+	t.Run("invalid parameter definition", func(t *testing.T) {
+		b.Definitions["param-definition"] = &definition.Schema{Type: "invalid"}
+		err := p.Validate("param", b)
+		assert.EqualError(t, err, `invalid definition schema for parameter "param": schema not valid: error unmarshaling type from json: "invalid" is not a valid type`)
+	})
 }

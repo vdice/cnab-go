@@ -33,13 +33,25 @@ func (p *Parameter) Validate(name string, bun Bundle) error {
 		return errors.New("parameter definition must be provided")
 	}
 
-	// Validate default against definition schema, if exists
+	if p.Destination == nil {
+		return errors.New("parameter destination must be provided")
+	}
+	if err := p.Destination.Validate(); err != nil {
+		return errors.Wrap(err, "invalid parameter destination")
+	}
+
+	// Validate parameter definition schema
 	schema, ok := bun.Definitions[p.Definition]
 	if !ok {
 		return fmt.Errorf("unable to find definition for %s", name)
 	}
+	if _, err := schema.ValidateSchema(); err != nil {
+		return errors.Wrapf(err, "invalid definition schema for parameter %q", name)
+	}
+
+	// Validate default against definition schema, if exists
+	var valResult *multierror.Error
 	if schema.Default != nil {
-		var valResult *multierror.Error
 		valErrs, err := schema.Validate(schema.Default)
 		if err != nil {
 			valResult = multierror.Append(valResult, errors.Wrapf(err, "encountered an error validating parameter %s", name))
@@ -47,13 +59,6 @@ func (p *Parameter) Validate(name string, bun Bundle) error {
 		for _, valErr := range valErrs {
 			valResult = multierror.Append(valResult, fmt.Errorf("encountered an error validating the default value %v for parameter %q: %v", schema.Default, name, valErr.Error))
 		}
-		if valResult.ErrorOrNil() != nil {
-			return valResult
-		}
 	}
-
-	if p.Destination == nil {
-		return errors.New("parameter destination must be provided")
-	}
-	return p.Destination.Validate()
+	return valResult.ErrorOrNil()
 }

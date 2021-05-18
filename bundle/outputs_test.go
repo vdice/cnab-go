@@ -37,4 +37,10 @@ func TestOutputValidate(t *testing.T) {
 		err := o.Validate("output", b)
 		assert.NoError(t, err)
 	})
+
+	t.Run("invalid output definition", func(t *testing.T) {
+		b.Definitions["output-definition"] = &definition.Schema{Type: "invalid"}
+		err := o.Validate("output", b)
+		assert.EqualError(t, err, `invalid definition schema for output "output": schema not valid: error unmarshaling type from json: "invalid" is not a valid type`)
+	})
 }
